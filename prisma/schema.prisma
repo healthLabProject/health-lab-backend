@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -8,4 +5,113 @@ generator client {
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+}
+
+model Hospital {
+    id               Int    @id @default(autoincrement())
+    email            String @unique
+    password         String
+    responsible_name String
+    fantasy_name     String
+    cnpj             String @unique
+    phone            String @unique
+
+    Address   Address @relation(fields: [addressId], references: [id])
+    addressId Int     @unique
+
+    Doctor    Doctor[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("hospitals")
+}
+
+model Doctor {
+    id       Int    @id @default(autoincrement())
+    email    String @unique
+    password String
+    crm      String @unique
+    name     String
+    cpf      String @unique
+    phone    String @unique
+
+    Hospital    Hospital  @relation(fields: [hospitalId], references: [id])
+    hospitalId  Int
+    Specialty   Specialty @relation(fields: [specialtyId], references: [id])
+    specialtyId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("doctors")
+}
+
+model Laboratory {
+    id              Int    @id @default(autoincrement())
+    email           String @unique
+    password        String
+    resposible_name String
+    fantasy_name    String
+    cnpj            String @unique
+    phone           String @unique
+
+    Address   Address @relation(fields: [addressId], references: [id])
+    addressId Int     @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("laboratories")
+}
+
+model Patient {
+    id       Int    @id @default(autoincrement())
+    email    String @unique
+    password String
+    name     String
+    cpf      String
+    phone    String @unique
+}
+
+model Address {
+    id         Int     @id @default(autoincrement())
+    street     String
+    city       String
+    complement String?
+    number     Int
+
+    state   State @relation(fields: [stateId], references: [id])
+    stateId Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Hospital   Hospital?
+    Laboratory Laboratory?
+
+    @@map("addresses")
+}
+
+model Specialty {
+    id     Int      @id @default(autoincrement())
+    name   String   @unique
+    Doctor Doctor[]
+
+    @@map("specialties")
+}
+
+model Phone {
+    id     Int    @id @default(autoincrement())
+    number String
+
+    @@map("phones")
+}
+
+model State {
+    id      Int       @id @default(autoincrement())
+    name    String    @unique
+    sign    String    @unique
+    Address Address[]
+
+    @@map("states")
 }
